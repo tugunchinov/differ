@@ -7,4 +7,6 @@ description = "This program helps you to create a diff of two files or to apply 
 [dependencies]
 clap = { version = "4.5.26", features = ["derive"] }
 miniz_oxide = "0.8.3"
+
+[dev-dependencies]
 rand = "0.8.5"
