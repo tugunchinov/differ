@@ -10,5 +10,5 @@
 
 `differ apply --file old_file.txt --patch out.patch -o new_file.txt`
 
-*For more information run:`
+*For more information run:*
 `differ --help`
