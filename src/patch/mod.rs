@@ -20,7 +20,7 @@ impl Patch {
     pub fn into_bytes(self) -> Vec<u8> {
         let mut result = Vec::with_capacity(self.diffs.len() * size_of::<Diff>());
 
-        result.extend(self.diffs.len().to_le_bytes());
+        result.extend((self.diffs.len() as u32).to_le_bytes());
 
         for diff in self.diffs {
             result.extend(diff.into_bytes());
@@ -32,9 +32,9 @@ impl Patch {
     pub fn from_bytes<B: AsRef<[u8]>>(bytes: B) -> std::io::Result<Self> {
         let mut bytes = bytes.as_ref();
 
-        let mut diffs_cnt_bytes = [0u8; 8];
+        let mut diffs_cnt_bytes = [0u8; 4];
         bytes.read_exact(&mut diffs_cnt_bytes)?;
-        let diffs_cnt = u64::from_le_bytes(diffs_cnt_bytes);
+        let diffs_cnt = u32::from_le_bytes(diffs_cnt_bytes);
 
         let mut diffs = Vec::with_capacity(size_of::<Diff>() * diffs_cnt as usize);
         let mut total_bytes_read = 0;
@@ -56,9 +56,7 @@ mod serde_tests {
 
     #[test]
     fn test_patch_serialize_deserialize() {
-        let diff_bytes = vec![
-            42, 0, 0, 0, 0, 0, 0, 0, 133, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4,
-        ];
+        let diff_bytes = [42, 0, 0, 0, 133, 0, 0, 0, 4, 0, 0, 0, 1, 2, 3, 4];
 
         let mut patch = Patch { diffs: Vec::new() };
 

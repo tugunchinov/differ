@@ -4,9 +4,9 @@ use std::io::ErrorKind;
 pub fn apply<B: AsRef<[u8]>>(bytes: B, patch: Patch) -> std::io::Result<Vec<u8>> {
     let mut result = bytes.as_ref().to_vec();
 
-    let mut shift: i128 = 0;
+    let mut shift: i64 = 0;
     for diff in patch.diffs {
-        let current_offset = (diff.get_offset() as i128 + shift) as usize;
+        let current_offset = (diff.get_offset() as i64 + shift) as usize;
         let len_old = diff.get_len_old() as usize;
         let len_new = diff.get_len_new() as usize;
 
@@ -27,7 +27,7 @@ pub fn apply<B: AsRef<[u8]>>(bytes: B, patch: Patch) -> std::io::Result<Vec<u8>>
             result.splice(current_offset..current_offset + len_old, diff);
         }
 
-        shift += len_new as i128 - len_old as i128;
+        shift += len_new as i64 - len_old as i64;
     }
 
     Ok(result)

@@ -1,7 +1,7 @@
 use crate::diff::Diff;
 use crate::patch::Patch;
 
-const ZERO_U64_LE_BYTES: &[u8] = &(0u64.to_le_bytes());
+const ZERO_U32_LE_BYTES: &[u8] = &(0u32.to_le_bytes());
 
 pub fn create<BO: AsRef<[u8]>, BN: AsRef<[u8]>>(
     old_bytes: BO,
@@ -24,8 +24,8 @@ pub fn create<BO: AsRef<[u8]>, BN: AsRef<[u8]>>(
             }
             let diff_end = i;
 
-            let offset_bytes = (diff_begin as u64).to_le_bytes();
-            let diff_len_bytes = ((diff_end - diff_begin) as u64).to_le_bytes();
+            let offset_bytes = (diff_begin as u32).to_le_bytes();
+            let diff_len_bytes = ((diff_end - diff_begin) as u32).to_le_bytes();
             let data = &new_bytes[diff_begin..diff_end];
 
             let diff =
@@ -40,23 +40,23 @@ pub fn create<BO: AsRef<[u8]>, BN: AsRef<[u8]>>(
 
     // new file is bigger
     if i < len_new {
-        let offset_bytes = (i as u64).to_le_bytes();
-        let diff_len_bytes = ((len_new - i) as u64).to_le_bytes();
+        let offset_bytes = (i as u32).to_le_bytes();
+        let diff_len_bytes = ((len_new - i) as u32).to_le_bytes();
         let data = &new_bytes[i..len_new];
 
         let diff =
-            Diff::from_bytes([&offset_bytes, ZERO_U64_LE_BYTES, &diff_len_bytes, data].concat())?.0;
+            Diff::from_bytes([&offset_bytes, ZERO_U32_LE_BYTES, &diff_len_bytes, data].concat())?.0;
 
         diffs.push(diff);
     }
 
     // new file is shorter
     if i < len_old {
-        let offset_bytes = (i as u64).to_le_bytes();
-        let diff_len_bytes = ((len_old - i) as u64).to_le_bytes();
+        let offset_bytes = (i as u32).to_le_bytes();
+        let diff_len_bytes = ((len_old - i) as u32).to_le_bytes();
 
         let diff =
-            Diff::from_bytes([&offset_bytes, &diff_len_bytes, ZERO_U64_LE_BYTES].concat())?.0;
+            Diff::from_bytes([&offset_bytes, &diff_len_bytes, ZERO_U32_LE_BYTES].concat())?.0;
 
         diffs.push(diff);
     }

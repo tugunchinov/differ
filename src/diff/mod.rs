@@ -5,13 +5,13 @@ use std::ops::Index;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct Diff {
     /// position in the old file
-    offset: u64,
+    offset: u32,
 
     /// number of replaced bytes
-    len_old: u64,
+    len_old: u32,
 
     /// number of replacing bytes
-    len_new: u64,
+    len_new: u32,
 
     /// replacing bytes
     // NB: data.len() == len_new
@@ -35,9 +35,9 @@ impl Diff {
         let mut bytes = bytes.as_ref();
         let mut bytes_read = 0;
 
-        let mut offset_bytes = [0u8; 8];
-        let mut length_old_bytes = [0u8; 8];
-        let mut length_new_bytes = [0u8; 8];
+        let mut offset_bytes = [0u8; 4];
+        let mut length_old_bytes = [0u8; 4];
+        let mut length_new_bytes = [0u8; 4];
 
         bytes.read_exact(&mut offset_bytes)?;
         bytes_read += offset_bytes.len();
@@ -48,9 +48,9 @@ impl Diff {
         bytes.read_exact(&mut length_new_bytes)?;
         bytes_read += length_new_bytes.len();
 
-        let offset = u64::from_le_bytes(offset_bytes);
-        let len_old = u64::from_le_bytes(length_old_bytes);
-        let len_new = u64::from_le_bytes(length_new_bytes);
+        let offset = u32::from_le_bytes(offset_bytes);
+        let len_old = u32::from_le_bytes(length_old_bytes);
+        let len_new = u32::from_le_bytes(length_new_bytes);
 
         let mut data = vec![0u8; len_new as usize];
         bytes.as_ref().read_exact(&mut data)?;
@@ -67,15 +67,15 @@ impl Diff {
         ))
     }
 
-    pub fn get_offset(&self) -> u64 {
+    pub fn get_offset(&self) -> u32 {
         self.offset
     }
 
-    pub fn get_len_old(&self) -> u64 {
+    pub fn get_len_old(&self) -> u32 {
         self.len_old
     }
 
-    pub fn get_len_new(&self) -> u64 {
+    pub fn get_len_new(&self) -> u32 {
         self.len_new
     }
 }
